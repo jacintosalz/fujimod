@@ -133,16 +133,8 @@ impl Board {
                 let read_limit = graph_read_limit(&session)?;
                 return Ok(Self::from_graph_session(session, read_limit));
             }
-            Opened::Xp4(session) => {
-                let read_limit = session.ram_bytes();
-                (Backend::Xp4(session), read_limit)
-            }
-            Opened::Xp5 {
-                session,
-                inputs,
-                read_limit,
-            } => (
-                Backend::Xp5(Box::new(super::xp5::Opened { session, inputs })),
+            Opened::Xp5 {session, inputs, read_limit} => (
+                Backend::Xp5(Box::new(super::xp5::Opened {session, inputs})),
                 read_limit,
             ),
         };
@@ -160,11 +152,6 @@ impl Board {
     }
     #[getter]
     fn boot_quantum(&self) -> PyResult<usize> {
-        if let Some(Backend::Xp4(session)) = &self.backend {
-            return session
-                .catalog_quantum()
-                .ok_or_else(|| error("board was not constructed from boot inputs".into()));
-        }
         self.session()?.definition["quantum"]
             .as_u64()
             .and_then(|v| v.try_into().ok())

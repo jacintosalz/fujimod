@@ -2,7 +2,8 @@
 //! interrupt 129): the `raw` wiring is admitted on RECC alone and checked,
 //! and so is `firmware_color`, on a RECC with `raw`, and
 //! `firmware_white_balance`, on a RECC with `firmware_color`.
-use fujimod_emulator_xp4_board::{Definition, Session};
+mod support;
+use fujimod_emulator_xp4_board::Definition;
 use serde_json::{Value, json};
 
 const RECC: u32 = 0xfff8_2000;
@@ -16,9 +17,9 @@ fn input(engine: &str, extra: Value) -> Value {
         "initial_registers": [[["Pc", 0x1000]]], "still_engines": [wiring]})
 }
 
-fn session(value: Value) -> Result<Session, String> {
+fn session(value: Value) -> Result<support::Board, String> {
     let definition: Definition = serde_json::from_value(value).map_err(|e| e.to_string())?;
-    Session::new(definition, None, vec![])
+    support::open(definition)
 }
 
 #[test]

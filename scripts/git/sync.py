@@ -328,16 +328,13 @@ def rebased_pin(
     if key in cache:
         return cache[key]
     found = None
-    if (
-        submodule.git("cat-file", "-e", f"{pinned}^{{commit}}", check=False).returncode
-        == 0
-    ):
-        if (
-            submodule.git(
-                "merge-base", "--is-ancestor", pinned, "HEAD", check=False
-            ).returncode
-            == 0
-        ):
+    if submodule.git("cat-file", "-e", f"{pinned}^{{commit}}", check=False).returncode:
+        # A pin from a merged and deleted branch: fetch it to find its twin.
+        submodule.git("fetch", "-q", "origin", pinned, check=False)
+    if submodule.git("cat-file", "-e", f"{pinned}^{{commit}}", check=False).returncode == 0:
+        if submodule.git(
+            "merge-base", "--is-ancestor", pinned, "HEAD", check=False
+        ).returncode == 0:
             found = pinned
     if found is None:
         wanted = patch_id(submodule, pinned)

@@ -437,6 +437,7 @@ fn xp4_session(resolved: &ResolvedConfiguration, inputs: Xp4Inputs<'_>) -> Resul
     let definition = serde_json::from_value(definition).map_err(|error| format!("XP4 board definition: {error}"))?;
     xp4::shared::build(execution, definition, inputs.flash, inputs.card_files, inputs.media,
         inputs.mode, inputs.engine, record)
+        .map(|(session, _)| session)
 }
 
 fn install_card_files(

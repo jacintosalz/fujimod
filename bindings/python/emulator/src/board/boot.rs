@@ -133,8 +133,12 @@ impl Board {
                 let read_limit = graph_read_limit(&session)?;
                 return Ok(Self::from_graph_session(session, read_limit));
             }
-            Opened::Xp5 {session, inputs, read_limit} => (
-                Backend::Xp5(Box::new(super::xp5::Opened {session, inputs})),
+            Opened::Xp5 {
+                session,
+                inputs,
+                read_limit,
+            } => (
+                Backend::Xp5(Box::new(super::xp5::Opened { session, inputs })),
                 read_limit,
             ),
         };
